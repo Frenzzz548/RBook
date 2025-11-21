@@ -1,9 +1,19 @@
+FROM maven:3.8.8-openjdk-11 AS build
+LABEL stage=builder
+WORKDIR /app
+
+# copy pom first to leverage Docker cache for dependencies
+COPY pom.xml .
+COPY src ./src
+
+# build the WAR inside the builder image
+RUN mvn -B package -DskipTests
+
 FROM tomcat:9-jdk11-openjdk
 LABEL maintainer="rbook"
 
-# copy built WAR into Tomcat
-ARG WAR_FILE=target/rbook.war
-COPY ${WAR_FILE} /usr/local/tomcat/webapps/ROOT.war
+# Copy WAR from build stage into Tomcat webapps as ROOT.war
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
 # create uploads directory (Railway will mount a persistent volume here)
 # NOTE: Railway disallows the VOLUME instruction in Dockerfiles. Do NOT add `VOLUME`.
