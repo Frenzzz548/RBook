@@ -1,0 +1,5 @@
+body { padding-top: 70px; }
+.card-cover { height: 260px; object-fit: cover; }
+.comic-cover { max-width: 100%; height: auto; }
+.reader-img { width: 100%; height: auto; }
+.navbar-brand { font-weight: 700; }
