@@ -7,7 +7,7 @@ Fitur utama:
 - CRUD komik (judul, penulis, deskripsi, cover)
 - Upload halaman/cover komik (disimpan di folder `uploads/`, nama file disimpan di DB)
 - Halaman membaca yang responsif (Bootstrap)
-- Template GitHub Actions + Dockerfile untuk deploy (template Railway)
+-- Template GitHub Actions untuk deploy (Railway). This repository no longer includes a `Dockerfile`.
 
 Persyaratan lingkungan (lokal / Railway):
 - JDK 11+
@@ -22,7 +22,10 @@ ENV yang harus diset sebelum menjalankan:
 - `UPLOAD_DIR` (opsional, default `uploads` di root aplikasi)
 
 Catatan deployment Railway:
-- Railway memiliki filesystem ephemeral; gambar yang diupload ke filesystem aplikasi kemungkinan hilang setelah redeploy. Untuk produksi gunakan object storage (S3) atau simpan halaman di layanan penyimpanan terpisah. Workflow GitHub Actions yang disertakan adalah template; Anda perlu memasukkan secret `RAILWAY_TOKEN` dan `RAILWAY_PROJECT_ID` di repo settings.
+- Railway memiliki filesystem ephemeral; gambar yang diupload ke filesystem aplikasi kemungkinan hilang setelah redeploy. Untuk produksi gunakan object storage (S3) atau simpan halaman di layanan penyimpanan terpisah.
+- Workflow GitHub Actions (`.github/workflows/railway-deploy.yml`) sekarang builds the WAR with Maven inside the CI runner and deploys using the Railway CLI (`railway up`). This avoids Dockerfile-related build errors.
+- Pastikan menambahkan repo secrets `RAILWAY_TOKEN` dan `RAILWAY_PROJECT_ID` di GitHub.
+- Buat Railway Volume dan mount ke `/usr/local/tomcat/uploads` untuk menyimpan file upload secara persistent.
 
 Build & run lokal (contoh):
 1. Set environment variable seperti `DB_URL`, `DB_USER`, `DB_PASSWORD`.
@@ -34,6 +37,6 @@ File penting:
 - `src/main/java` — sumber Java (servlet, DAO, model)
 - `src/main/webapp` — JSP dan assets
 - `sql/schema.sql` — skema database
-- `.github/workflows/railway-deploy.yml` — template CI/CD
+ - `.github/workflows/railway-deploy.yml` — CI/CD workflow (build with Maven + deploy with Railway CLI)
 
 Jika ingin saya lanjutkan untuk menambahkan fitur lanjutan (S3, pagination, full-text search), beri tahu saya.
